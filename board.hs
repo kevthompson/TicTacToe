@@ -16,10 +16,12 @@ import Data.List
 
 newBoard = [[0, 0, 0],[0, 0, 0],[0, 0, 0]]
 
-getPiece :: Char -> Char
+winConditions = [(1, 4, 7), (2, 5, 8), (3, 6, 9), (1, 2, 3), (4, 5, 6), (7, 8, 9), (1, 5, 9), (3, 5, 7)]
+
+getPiece :: Int -> Char
 getPiece a
-    | a == '1' = 'X'
-    | a == '2' = 'O'
+    | a == 1 = 'X'
+    | a == 2 = 'O'
     | otherwise = ' '
 
 -- printBoard a = intersperse ' ' $ intersperse '|' $ map (getPiece) $ concat $ intercalate "\n" $ map(map(show)) a
@@ -27,9 +29,29 @@ stringify :: [[Int]] -> [Char]
 stringify board = intercalate "\n" $ map(show) board ++ ["\n"]
     
 main = do
+    putStr $ stringify newBoard
     input <- getLine
     let n = read input :: Int
-    putStr $ stringify newBoard
+    let board = takeTurn newBoard n
+    putStr $ stringify board
+    let winner = checkEnd board
+    declareWinner winner
+
+takeTurn :: [[Int]] -> Int -> [[Int]]
+takeTurn board pos
+    | key == 0 = [[1, 2, 3], [1, 2, 3], [1, 2, 3]]
+    | otherwise = newBoard
+    where key = board !! (pos `div` 3) !! (pos `mod` 3)
+
+
+checkEnd board = 0
+
+declareWin :: Int -> String
+declareWin winner
+    | winner > 0 = "We have a winner! Player token: ": $ getPiece winner
+    | winner == -1 = "It's a tie"
+    | otherwise = []
+declareTie = putStr "TieGame"
     -- if n > 9 
     --     then print "value too large"
 

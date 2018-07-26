@@ -6,6 +6,7 @@
 -- | (1, 2, 3), (4, 5, 6), (7, 8, 9), 
 -- | (1, 5, 9), (3, 5, 7)
 import Data.List
+import qualified Data.Set
 -- get move (recursively call self until list is full)
 -- getMove :: (Ord a) => [a] -> a
 -- getMove n
@@ -35,23 +36,30 @@ main = do
     let board = takeTurn newBoard n
     putStr $ stringify board
     let winner = checkEnd board
-    declareWinner winner
+    putStr $ declareWin winner
 
 takeTurn :: [[Int]] -> Int -> [[Int]]
 takeTurn board pos
-    | key == 0 = [[1, 2, 3], [1, 2, 3], [1, 2, 3]]
+    | key == 0 = modRow board pos 1
     | otherwise = newBoard
     where key = board !! (pos `div` 3) !! (pos `mod` 3)
 
+modRow :: [[Int]] -> Int -> Int -> [[Int]]
+modRow board pos val = (fst rows):(modCol $ head $ snd rows pos val): tail. snd rows
+    where rows = splitAt (pos `div` 3) board
 
-checkEnd board = 0
+modCol :: [Int] -> Int -> Int -> [Int]
+modCol row pos val = (fst $ cols):val:(tail $ snd cols)
+    where cols = splitAt (pos `mod` 3) row
+checkEnd :: [[Int]] -> Int
+checkEnd board = 1
 
 declareWin :: Int -> String
 declareWin winner
-    | winner > 0 = "We have a winner! Player token: ": $ getPiece winner
+    | winner > 0 = "We have a winner! Player token: " ++ [getPiece winner] ++ "\n"
     | winner == -1 = "It's a tie"
     | otherwise = []
-declareTie = putStr "TieGame"
     -- if n > 9 
     --     then print "value too large"
 
+tupleToList (x, y, z) = [x, y, z]

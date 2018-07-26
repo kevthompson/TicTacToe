@@ -42,9 +42,10 @@ takeTurn :: [[Int]] -> Int -> [[Int]]
 takeTurn board pos
     | pos > 8 = board
     | pos < 0 = board
-    | key == 0 = modRow board pos 1
+    | key == 0 = modRow board pos piece
     | otherwise = newBoard
     where key = board !! (pos `div` 3) !! (pos `mod` 3)
+          piece = if odd $ sum $ map(length. elemIndices 0) board then 1 else 2
 
 modRow :: [[Int]] -> Int -> Int -> [[Int]]
 modRow board pos val = (fst rows)++(modCol (head $ snd rows ) pos val):(tail $ snd rows)
@@ -53,8 +54,26 @@ modRow board pos val = (fst rows)++(modCol (head $ snd rows ) pos val):(tail $ s
 modCol :: [Int] -> Int -> Int -> [Int]
 modCol row pos val = (fst cols)++val:(tail $ snd cols)
     where cols = splitAt (pos `mod` 3) row
+
 checkEnd :: [[Int]] -> Int
-checkEnd board = 1
+checkEnd board
+    | winner > 0 = winner
+    | zeros == 0 = -1
+    | otherwise = 0
+    where winner = checkWin board
+          zeros = sum $ map(length. elemIndices 0) board 
+
+checkWin :: [[Int]] -> Int
+checkWin board
+    | not $ null xWins = 1
+    | not $ null yWins = 2
+    | otherwise = 0
+    where res = map (getVals board) winConditions
+          xWins = filter (==1) res 
+          yWins = filter (==8) res
+
+getVals :: [[Int]] -> (Int, Int, Int) -> Int
+getVals board tup = product [ board !! ((idx-1) `mod` 3) !! ((idx-1) `div` 3) | idx <- tupleToList tup] 
 
 declareWin :: Int -> String
 declareWin winner

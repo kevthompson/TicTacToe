@@ -40,16 +40,18 @@ main = do
 
 takeTurn :: [[Int]] -> Int -> [[Int]]
 takeTurn board pos
+    | pos > 8 = board
+    | pos < 0 = board
     | key == 0 = modRow board pos 1
     | otherwise = newBoard
     where key = board !! (pos `div` 3) !! (pos `mod` 3)
 
 modRow :: [[Int]] -> Int -> Int -> [[Int]]
-modRow board pos val = (fst rows):(modCol $ head $ snd rows pos val): tail. snd rows
+modRow board pos val = (fst rows)++(modCol (head $ snd rows ) pos val):(tail $ snd rows)
     where rows = splitAt (pos `div` 3) board
 
 modCol :: [Int] -> Int -> Int -> [Int]
-modCol row pos val = (fst $ cols):val:(tail $ snd cols)
+modCol row pos val = (fst cols)++val:(tail $ snd cols)
     where cols = splitAt (pos `mod` 3) row
 checkEnd :: [[Int]] -> Int
 checkEnd board = 1

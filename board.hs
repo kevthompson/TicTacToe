@@ -15,9 +15,19 @@ import qualified Data.Set
 --     | otherwise     = getMove $ (read input :: Int):n
 --     where input <- getLine
 
-newBoard = [[0, 0, 0],[0, 0, 0],[0, 0, 0]]
+zeroBoard = [[0, 0, 0],[0, 0, 0],[0, 0, 0]]
 
 winConditions = [(1, 4, 7), (2, 5, 8), (3, 6, 9), (1, 2, 3), (4, 5, 6), (7, 8, 9), (1, 5, 9), (3, 5, 7)]
+
+start = do
+    winner <- outerLoop zeroBoard
+    putStr $ declareWin winner 
+
+outerLoop :: [[Int]] -> Int
+outerLoop board
+    | winner == 0 = do { ans <- gameLoop board; return ans }
+    | otherwise = winner
+    where winner = checkEnd board
 
 getPiece :: Int -> Char
 getPiece a
@@ -25,25 +35,29 @@ getPiece a
     | a == 2 = 'O'
     | otherwise = ' '
 
--- printBoard a = intersperse ' ' $ intersperse '|' $ map (getPiece) $ concat $ intercalate "\n" $ map(map(show)) a
 stringify :: [[Int]] -> [Char]
 stringify board = intercalate "\n" $ map(show) board ++ ["\n"]
     
-main = do
-    putStr $ stringify newBoard
+-- gameLoop :: [[Int]] ->  Int
+gameLoop board = do
+    newBoard <- getInput board
+    let ans = outerLoop newBoard
+    return ans
+
+-- getInput :: [[Int]] -> IO [[Int]]
+getInput board = do
+    putStr $ stringify board
     input <- getLine
     let n = read input :: Int
-    let board = takeTurn newBoard n
-    putStr $ stringify board
-    let winner = checkEnd board
-    putStr $ declareWin winner
+    let newBoard = makeMove board n
+    return newBoard
 
-takeTurn :: [[Int]] -> Int -> [[Int]]
-takeTurn board pos
+makeMove :: [[Int]] -> Int -> [[Int]]
+makeMove board pos
     | pos > 8 = board
     | pos < 0 = board
     | key == 0 = modRow board pos piece
-    | otherwise = newBoard
+    | otherwise = board
     where key = board !! (pos `div` 3) !! (pos `mod` 3)
           piece = if odd $ sum $ map(length. elemIndices 0) board then 1 else 2
 
